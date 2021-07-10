@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:js/js.dart';
+import 'package:js_interop_example/interop.dart';
 
 void main() {
   runApp(MyApp());
@@ -8,54 +10,74 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'JS Interop Demo',
+      home: JsInteropDemo(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  final String title;
-
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+class JsInteropDemo extends StatefulWidget {
+  const JsInteropDemo({Key? key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _JsInteropDemoState createState() => _JsInteropDemoState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _JsInteropDemoState extends State<JsInteropDemo> {
+  late ConnectionManager _connectionManager;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+
+    final wrappedHandler = allowInterop(_onConnectionChanged);
+    final connectionManagerOptions = ConnectionManagerOptions(
+      connectionChangeHandler: wrappedHandler,
+    );
+
+    _connectionManager = ConnectionManager(connectionManagerOptions);
+  }
+
+  _onConnectionChanged() {
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('JS Interop Demo'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              text: TextSpan(
+                text: 'Your current connection Effective Type is ',
+                children: <TextSpan>[
+                  TextSpan(
+                      text: _connectionManager.currentEffectiveType,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                ],
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            SizedBox(height: 20),
+            RichText(
+              text: TextSpan(
+                text: 'Your current connection Downlink is ',
+                children: <TextSpan>[
+                  TextSpan(
+                      text: _connectionManager.currentDownlink.toString(),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                ],
+              ),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }
