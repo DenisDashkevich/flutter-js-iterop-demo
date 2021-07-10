@@ -1,0 +1,16 @@
+name: js_interop_example
+description: JS Interop Example
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: "2.2.2"
+
+dependencies:
+  js: 0.6.3
+  flutter:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
