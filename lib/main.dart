@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:js/js.dart';
-import 'package:js_interop_example/interop.dart';
+import 'package:js_interop_example/interop_connection.dart';
+import 'package:js_interop_example/interop_clicks.dart';
 
 void main() {
   runApp(MyApp());
@@ -25,6 +26,7 @@ class JsInteropDemo extends StatefulWidget {
 
 class _JsInteropDemoState extends State<JsInteropDemo> {
   late ConnectionManager _connectionManager;
+  late ClicksManager _clicksManager;
 
   @override
   void initState() {
@@ -36,6 +38,7 @@ class _JsInteropDemoState extends State<JsInteropDemo> {
     );
 
     _connectionManager = ConnectionManager(connectionManagerOptions);
+    _clicksManager = ClicksManager();
   }
 
   _onConnectionChanged() {
@@ -76,6 +79,19 @@ class _JsInteropDemoState extends State<JsInteropDemo> {
                 ],
               ),
             ),
+            SizedBox(height: 20),
+            StreamBuilder<ClickCoordinates>(
+              stream: _clicksManager.clicksCoordinates,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text(
+                      'Last Pointer Coordinates: x: ${snapshot.data?.x}, y: ${snapshot.data?.y}');
+                } else {
+                  return Text(
+                      'Last Pointer Coordinates: No coordinates. Please click somewhere.');
+                }
+              },
+            )
           ],
         ),
       ),
