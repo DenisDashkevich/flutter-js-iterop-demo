@@ -1,3 +1,6 @@
+
+// use custom event emitter instead of browsers native 
+// EventTarget because dart monkey patches this class.
 class EventEmitter {
     constructor() {
         this._storage = new Map();
