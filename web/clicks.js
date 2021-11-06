@@ -37,12 +37,20 @@ class DartClickManager extends EventEmitter {
     constructor() {
         super();
 
+        this.buttonElement = document.createElement('button');
+        this.buttonElement.innerText = 'Web Native Button';
+
         window.addEventListener('click', (e) => {
             const coordinatesChangedEvent = new DartClickManagerCoordinatesChangedEvent(
                 e.clientX,
                 e.clientY);
 
             this.dispatchEvent(coordinatesChangedEvent);
+
+            if (e.target === this.buttonElement) {
+                const buttonClickedEvent = new DartClickManagerButtonClickedEvent();
+                this.dispatchEvent(buttonClickedEvent);
+            }
         });
 
         window._clickManager = this;
@@ -51,11 +59,18 @@ class DartClickManager extends EventEmitter {
 
 const DartClickManagerEventType = {
     CoordinatesChanged: 'CoordinatesChanged',
+    ButtonClicked: 'ButtonClicked',
 };
 
 class DartClickManagerEvent {
     constructor(type) {
         this.type = type;
+    }
+}
+
+class DartClickManagerButtonClickedEvent extends DartClickManagerEvent {
+    constructor() {
+        super(DartClickManagerEventType.ButtonClicked);
     }
 }
 
@@ -73,4 +88,5 @@ window.ClicksNamespace = {
     DartClickManagerEventType,
     DartClickManagerEvent,
     DartClickManagerCoordinatesChangedEvent,
+    DartClickManagerButtonClickedEvent,
 }

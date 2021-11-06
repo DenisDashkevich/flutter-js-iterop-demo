@@ -3,6 +3,7 @@ library clicks;
 
 import 'dart:async';
 import 'package:js/js.dart';
+import 'dart:ui' as ui;
 
 @JS('DartClickManagerEvent')
 class _ClicksManagerEvent {
@@ -15,16 +16,23 @@ class _ClicksManagerCoordinatesChangedEvent extends _ClicksManagerEvent {
   external double get y;
 }
 
+@JS('DartClickManagerButtonClickedEvent')
+class _ClicksManagerButtonClickedEvent extends _ClicksManagerEvent {}
+
 @JS('DartClickManagerEventType')
 class EventType {
   // ignore: non_constant_identifier_names
   external static String get CoordinatesChanged;
+  // ignore: non_constant_identifier_names
+  external static String get ButtonClicked;
 }
 
 typedef _ClicksManagerEventListener = void Function(_ClicksManagerEvent event);
 
 @JS('DartClickManager')
 class _ClicksManagerInterop {
+  external dynamic get buttonElement;
+
   external void addEventListener(
     String event,
     _ClicksManagerEventListener listener,
@@ -78,19 +86,35 @@ class ClickCoordinates {
   ClickCoordinates(this.x, this.y);
 }
 
+class ButtonClickedEvent {}
+
 class ClicksManager {
   late Stream<ClickCoordinates> _clickCoordinates;
+  late Stream<ButtonClickedEvent> _buttonClicked;
 
   ClicksManager() {
     final interop = _ClicksManagerInterop();
     final _streamProvider = _EventStreamProvider.forTarget(interop);
+
+    // ignore: undefined_prefixed_name
+    ui.platformViewRegistry.registerViewFactory(
+      'web-button',
+      (viewId) => interop.buttonElement,
+    );
 
     _clickCoordinates = _streamProvider
         .forEvent<_ClicksManagerCoordinatesChangedEvent>(
           EventType.CoordinatesChanged,
         )
         .map((event) => ClickCoordinates(event.x, event.y));
+
+    _buttonClicked = _streamProvider
+        .forEvent<_ClicksManagerButtonClickedEvent>(
+          EventType.ButtonClicked,
+        )
+        .map((event) => ButtonClickedEvent());
   }
 
   Stream<ClickCoordinates> get clicksCoordinates => _clickCoordinates;
+  Stream<ButtonClickedEvent> get buttonClicked => _buttonClicked;
 }

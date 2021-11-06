@@ -25,6 +25,7 @@ class JsInteropDemo extends StatefulWidget {
 }
 
 class _JsInteropDemoState extends State<JsInteropDemo> {
+  int _buttonClickedCount = 0;
   late ConnectionManager _connectionManager;
   late ClicksManager _clicksManager;
 
@@ -39,10 +40,19 @@ class _JsInteropDemoState extends State<JsInteropDemo> {
 
     _connectionManager = ConnectionManager(connectionManagerOptions);
     _clicksManager = ClicksManager();
+    _clicksManager.buttonClicked.listen((event) {
+      _incrementButtonClickedCount();
+    });
   }
 
   _onConnectionChanged() {
     setState(() {});
+  }
+
+  _incrementButtonClickedCount() {
+    setState(() {
+      _buttonClickedCount = _buttonClickedCount + 1;
+    });
   }
 
   @override
@@ -91,7 +101,15 @@ class _JsInteropDemoState extends State<JsInteropDemo> {
                       'Last Pointer Coordinates: No coordinates. Please click somewhere.');
                 }
               },
-            )
+            ),
+            SizedBox(height: 20),
+            SizedBox(
+              height: 20,
+              width: 200,
+              child: HtmlElementView(viewType: 'web-button'),
+            ),
+            SizedBox(height: 20),
+            Text('Button click count: $_buttonClickedCount'),
           ],
         ),
       ),
